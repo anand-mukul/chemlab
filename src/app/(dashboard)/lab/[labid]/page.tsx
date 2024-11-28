@@ -1,15 +1,13 @@
 import React from 'react'
 
 interface Props {
-    params: {
-        labid: string
-    }
+  params: {
+    labid: string;
+  };
 }
 
-const page = (labid: Props) => {
-  return (
-    <div>lab id {labid.params.labid}</div>
-  )
-}
+const Page = ({ params }: Props) => {
+  return <div>lab id {params.labid}</div>;
+};
 
-export default page
+export default Page;
