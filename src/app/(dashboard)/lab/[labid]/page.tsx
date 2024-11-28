@@ -1,13 +1,8 @@
-import React from 'react'
-
-interface Props {
-  params: {
-    labid: string;
-  };
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ labid: string }>;
+}) {
+  const labid = (await params).labid;
+  return <div>My Lab ID: {labid}</div>;
 }
-
-const Page = ({ params }: Props) => {
-  return <div>lab id {params.labid}</div>;
-};
-
-export default Page;
