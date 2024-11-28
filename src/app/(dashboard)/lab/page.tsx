@@ -1,9 +1,9 @@
 import React from 'react'
 
-export default function dashboard() {
+export default function page() {
   return (
     <div>
-      dashboard
+     Coming Soon...
     </div>
   )
 }

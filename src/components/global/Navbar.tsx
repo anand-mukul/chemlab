@@ -2,10 +2,12 @@
 import Link from "next/link";
 import { useState } from "react";
 import { HoverBorderGradient } from "../ui/hover-border-gradient";
-import { FlaskConical, LogIn, Menu, X } from "lucide-react";
+import { Beaker, FlaskConical, LogIn, Menu, X } from "lucide-react";
 import { Button } from "../ui/button";
+import { useAuth, UserButton } from "@clerk/nextjs";
 
 export function Navbar() {
+  const { isSignedIn } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -48,16 +50,32 @@ export function Navbar() {
 
           {/* Sign In Button */}
           <div className="hidden md:block">
-            <Link href="/sign-in">
-              <HoverBorderGradient
-                containerClassName="rounded-full"
-                as="button"
-                className="flex items-center space-x-2 bg-white dark:bg-black text-black dark:text-white hover:text-zinc-700 dark:hover:text-zinc-300 px-4 py-2 text-sm font-medium shadow-sm"
-              >
-                <LogIn size={16} />
-                <span>Sign In</span>
-              </HoverBorderGradient>
-            </Link>
+            {isSignedIn ? (
+              <div className="flex items-center space-x-4">
+                <Link href="/lab">
+                  <HoverBorderGradient
+                    containerClassName="rounded-full"
+                    as="button"
+                    className="flex items-center space-x-2 bg-white dark:bg-black text-black dark:text-white hover:text-zinc-700 dark:hover:text-zinc-300 px-4 py-2 text-sm font-medium shadow-sm"
+                  >
+                    <span>Lab</span>
+                    <Beaker size={16} />
+                  </HoverBorderGradient>
+                </Link>
+                <UserButton />
+              </div>
+            ) : (
+              <Link href="/sign-in">
+                <HoverBorderGradient
+                  containerClassName="rounded-full"
+                  as="button"
+                  className="flex items-center space-x-2 bg-white dark:bg-black text-black dark:text-white hover:text-zinc-700 dark:hover:text-zinc-300 px-4 py-2 text-sm font-medium shadow-sm"
+                >
+                  <LogIn size={16} />
+                  <span>Sign In</span>
+                </HoverBorderGradient>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -84,16 +102,32 @@ export function Navbar() {
                 {item}
               </Link>
             ))}
-            <Link href="/sign-in">
-              <HoverBorderGradient
-                containerClassName="rounded-full"
-                as="button"
-                className="w-full flex justify-center items-center space-x-2 bg-white dark:bg-black text-black dark:text-white px-4 py-2 text-sm font-medium shadow-sm transition-transform hover:scale-105"
-              >
-                <LogIn size={16} />
-                <span>Sign In</span>
-              </HoverBorderGradient>
-            </Link>
+            {isSignedIn ? (
+              <div className="flex items-center space-x-4">
+                <Link href="/lab">
+                  <HoverBorderGradient
+                    containerClassName="rounded-full"
+                    as="button"
+                    className="flex items-center space-x-2 bg-white dark:bg-black text-black dark:text-white hover:text-zinc-700 dark:hover:text-zinc-300 px-4 py-2 text-sm font-medium shadow-sm"
+                  >
+                    <span>Lab</span>
+                    <Beaker size={16} />
+                  </HoverBorderGradient>
+                </Link>
+                <UserButton />
+              </div>
+            ) : (
+              <Link href="/sign-in">
+                <HoverBorderGradient
+                  containerClassName="rounded-full"
+                  as="button"
+                  className="w-full flex justify-center items-center space-x-2 bg-white dark:bg-black text-black dark:text-white px-4 py-2 text-sm font-medium shadow-sm"
+                >
+                  <LogIn size={16} />
+                  <span>Sign In</span>
+                </HoverBorderGradient>
+              </Link>
+            )}
           </div>
         </div>
       )}

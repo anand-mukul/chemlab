@@ -8,8 +8,10 @@ import { Vortex } from "@/components/ui/vortex";
 import { ArrowRight } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 
 export default function Home() {
+  const { isSignedIn } = useAuth();
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -46,19 +48,29 @@ export default function Home() {
               </div>
 
               <h1 className="max-w-4xl text-5xl font-bold md:text-6xl lg:text-7xl">
-              Advancing Science Through{" "}
+                Advancing Science Through{" "}
                 <span className="text-violet-600">Virtual</span> Lab.
               </h1>
               <p className="mt-5 max-w-prose text-zinc-700 dark:text-zinc-400 sm:text-lg">
-              Cutting-edge research and analysis in our state-of-the-art laboratory.
+                Cutting-edge research and analysis in our state-of-the-art
+                laboratory.
               </p>
 
-              <Link
-                className={buttonVariants({ size: "lg", className: "mt-5" })}
-                href="/sign-in"
-              >
-                Enter the Lab <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
+              {isSignedIn ? (
+                <Link
+                  className={buttonVariants({ size: "lg", className: "mt-5" })}
+                  href="/lab"
+                >
+                  Enter the Lab <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              ) : (
+                <Link
+                  className={buttonVariants({ size: "lg", className: "mt-5" })}
+                  href="/sign-in"
+                >
+                  Enter the Lab <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              )}
             </MaxWidthWrapper>
           </Vortex>
         </div>
@@ -114,8 +126,7 @@ export default function Home() {
         </div>
       </div>
 
-        <div className="mb-10">
-      </div>
+      <div className="mb-10"></div>
     </div>
   );
 }
