@@ -44,7 +44,7 @@ export async function middleware(request: NextRequest) {
   if (!accessToken && refreshToken) {
     try {
       const response = await axios.post(
-        `http://localhost:7777/api/v1/users/refresh-token`,
+        `https://chemlab-backend.onrender.com/api/v1/users/refresh-token`,
         { refreshToken },
         { withCredentials: true }
       );
@@ -75,7 +75,7 @@ export async function middleware(request: NextRequest) {
       };
 
       const responseUrl = await axios.get(
-        `http://localhost:7777/api/v1/users/current-user`,
+        `https://chemlab-backend.onrender.com/api/v1/users/current-user`,
         {
           headers: headers,
           withCredentials: true,
