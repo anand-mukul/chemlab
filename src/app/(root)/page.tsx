@@ -8,10 +8,10 @@ import { Vortex } from "@/components/ui/vortex";
 import { ArrowRight } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/authContext";
 
 export default function Home() {
-  const { isSignedIn } = useAuth();
+  const { user } = useAuth();
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -56,7 +56,7 @@ export default function Home() {
                 laboratory.
               </p>
 
-              {isSignedIn ? (
+              {user ? (
                 <Link
                   className={buttonVariants({ size: "lg", className: "mt-5" })}
                   href="/lab"

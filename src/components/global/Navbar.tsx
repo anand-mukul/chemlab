@@ -2,12 +2,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { HoverBorderGradient } from "../ui/hover-border-gradient";
-import { Beaker, FlaskConical, LogIn, Menu, X } from "lucide-react";
+import { Beaker, FlaskConical, LogIn, Menu, User2, X } from "lucide-react";
 import { Button } from "../ui/button";
-import { useAuth, UserButton } from "@clerk/nextjs";
+import { useAuth } from "@/contexts/authContext";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export function Navbar() {
-  const { isSignedIn } = useAuth();
+  const { user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -50,7 +51,7 @@ export function Navbar() {
 
           {/* Sign In Button */}
           <div className="hidden md:block">
-            {isSignedIn ? (
+            {user ? (
               <div className="flex items-center space-x-4">
                 <Link href="/lab">
                   <HoverBorderGradient
@@ -62,7 +63,12 @@ export function Navbar() {
                     <Beaker size={16} />
                   </HoverBorderGradient>
                 </Link>
-                <UserButton />
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src={user?.avatar} alt={user?.username} />
+                  <AvatarFallback>
+                    <User2 className="h-4 w-4" />
+                  </AvatarFallback>
+                </Avatar>
               </div>
             ) : (
               <Link href="/sign-in">
@@ -102,7 +108,7 @@ export function Navbar() {
                 {item}
               </Link>
             ))}
-            {isSignedIn ? (
+            {user ? (
               <div className="flex items-center space-x-4">
                 <Link href="/lab">
                   <HoverBorderGradient
@@ -114,7 +120,12 @@ export function Navbar() {
                     <Beaker size={16} />
                   </HoverBorderGradient>
                 </Link>
-                <UserButton />
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src={user?.avatar} alt={user?.username} />
+                  <AvatarFallback>
+                    <User2 className="h-4 w-4" />
+                  </AvatarFallback>
+                </Avatar>
               </div>
             ) : (
               <Link href="/sign-in">

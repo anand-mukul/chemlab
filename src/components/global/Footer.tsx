@@ -2,6 +2,7 @@ import React from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Link from "next/link";
 import { ModeToggle } from "./ModeToggle";
+import { Button } from "../ui/button";
 
 export default function Footer() {
   return (
@@ -58,12 +59,10 @@ export default function Footer() {
                   placeholder="Your email address"
                   className="w-full sm:w-auto flex-grow px-4 py-2 mb-3 sm:mb-0 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:text-gray-200 dark:bg-gray-700"
                 />
-                <button
-                  type="submit"
-                  className="ml-2 px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-white font-semibold transition-colors"
-                >
+                <Button className="ml-1 sm:ml-2 w-full sm:w-auto mt-2 sm:mt-0"
+                  type="submit">
                   Subscribe
-                </button>
+                </Button>
               </form>
             </div>
           </div>
@@ -71,7 +70,7 @@ export default function Footer() {
           {/* Social Media Icons */}
           <div className="mt-10 flex justify-center space-x-6">
             {[
-              { href: "#", icon: "fab fa-facebook-f" },
+              { href: "https://github.com/anand-mukul", icon: "fab fa-github" },
               { href: "#", icon: "fab fa-twitter" },
               { href: "https://www.linkedin.com/in/dev-mukul", icon: "fab fa-linkedin-in" },
               { href: "#", icon: "fab fa-instagram" },

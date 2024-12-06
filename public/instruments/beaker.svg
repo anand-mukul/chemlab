@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -10 110 135">
+  <script type="text/javascript">
+    function updatePipette(volume, liquidColor) {
+      // Validate volume (0-10 mL)
+      const clampedVolume = Math.max(0, Math.min(10, volume));
+      
+      // Select pipette liquid and volume text elements
+      const liquidElement = document.getElementById('pipette-liquid');
+      const volumeText = document.getElementById('volume-text');
+      
+      // Calculate liquid height based on volume (inverse scale)
+      const liquidHeight = (clampedVolume / 10) * 40;
+      
+      // Update liquid properties
+      liquidElement.setAttribute('height', liquidHeight);
+      liquidElement.setAttribute('fill', liquidColor);
+      
+      // Update volume text
+      volumeText.textContent = `${clampedVolume.toFixed(1)} mL`;
+    }
+
+    function drawLiquid(volume, liquidColor) {
+      // Simulate drawing liquid into the pipette
+      updatePipette(volume, liquidColor);
+      
+      // Optional: Add drawing animation or sound effect
+      console.log(`Drawing ${volume} mL of ${liquidColor} liquid`);
+    }
+
+    function dispenseLiquid() {
+      // Simulate dispensing liquid from the pipette
+      const liquidElement = document.getElementById('pipette-liquid');
+      const volumeText = document.getElementById('volume-text');
+      
+      liquidElement.setAttribute('height', '0');
+      volumeText.textContent = '0.0 mL';
+      
+      console.log('Liquid dispensed');
+    }
+  </script>
+
+  <!-- Pipette Body Path -->
+  <path d="M15.316 5.11c-.488.136-.902.503-1.137 1.011-.527 1.133-.183 1.898 1.996 4.395 1.078 1.242 1.559 1.855 1.774 2.28.18.352.18.669.172 35.103 0 24.223.027 35.039.09 35.699.273 2.578 1.015 4.578 2.418 6.433 2.097 2.786 5.164 4.457 8.933 4.875 1.195.125 39.832.125 41.102 0 2.106-.226 3.95-.906 5.84-2.152 2.57-1.71 4.48-4.703 5.121-8.016.18-.894.18-1.511.172-36.332V12.988l.336-.445c.18-.242.848-1.05 1.473-1.789 2.207-2.633 2.343-2.824 2.425-3.547.078-.777-.425-1.637-1.187-1.988L84.375 5l-34.37.008c-22.493.012-34.478.039-34.689.102m67.863 2.53c-.84.907-3.2 3.829-3.445 4.262-.145.27-.153 2.407-.2 36.195l-.042 35.91-.247.875c-.425 1.504-1.003 2.668-1.972 3.953-1.32 1.747-3.074 2.915-5.336 3.547l-.77.215-20.125.027c-21.352.028-21.39.028-23.062-.398-.949-.242-2.414-.914-3.265-1.48-1.672-1.153-3.032-2.95-3.692-4.93-.558-1.676-.62-2.524-.566-7.445l.016-2.188h4.05c2.227 0 4.137-.027 4.254-.055.305-.09.488-.5.371-.832-.054-.156-.164-.308-.246-.355-.082-.035-2.015-.078-4.285-.098l-4.144-.027V66.05h4.07c3.402 0 4.125-.015 4.332-.133.433-.218.5-.652.144-.996l-.215-.226h-8.332v-8.89l3.829.054c2.097.027 4.003.016 4.25-.02.695-.117.949-.703.46-1.086-.234-.187-.324-.187-4.386-.187h-4.152v-9.035l8.34-.055.218-.254c.27-.316.27-.535 0-.851l-.219-.254-8.34-.055V35.21h4.126c2.515 0 4.18-.039 4.289-.093.441-.235.379-1.055-.094-1.184-.125-.035-2.043-.062-4.27-.07l-4.05-.012v-8.762l8.34-.054.218-.254q.394-.465.043-.887l-.172-.219-4.215-.027-4.214-.024v-11.46l-.29-.407c-.163-.226-1.039-1.293-1.945-2.363-.914-1.074-1.656-1.969-1.656-1.996 0-.028 15.051-.047 33.441-.047h33.438z" 
+        fill="white" 
+        stroke="black" 
+        stroke-width="1"/>
+  
+  <!-- Liquid in Pipette -->
+  <rect 
+    id="pipette-liquid" 
+    x="40" 
+    y="80" 
+    width="20" 
+    height="0" 
+    fill="blue"
+    transform="scale(1, -1)"
+    transform-origin="center"
+  />
+  
+  <!-- Volume Text -->
+  <text 
+    id="volume-text" 
+    x="50" 
+    y="120" 
+    text-anchor="middle" 
+    font-size="10"
+  >0.0 mL</text>
+</svg>
