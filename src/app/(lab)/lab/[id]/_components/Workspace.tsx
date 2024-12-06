@@ -10,6 +10,7 @@ import axios from "axios";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { toast } from "sonner";
+import ReactionEquationBox from "./ReactionEquationBox";
 
 type Chemical = {
   name: string;
@@ -37,6 +38,7 @@ const Workspace: React.FC = () => {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [reactionEquation, setReactionEquation] = useState<string | null>(null);
 
   const handleDragOver = (e: React.DragEvent) => e.preventDefault();
 
@@ -216,7 +218,7 @@ const Workspace: React.FC = () => {
         duration: 0.7,
         ease: "power2.inOut",
       });
-      
+
     gsap.to(reactionCircleSelector, {
       boxShadow: `0px 0px 15px 5px ${chemical.color}`,
       duration: 0.5,
@@ -230,50 +232,68 @@ const Workspace: React.FC = () => {
   const startReaction = async (instrumentId: string) => {
     setIsLoading(true);
     const instrument = items.find((item) => item.id === instrumentId);
-    if (!instrument || !instrument.currentChemicals?.length) return;
+    if (!instrument || !instrument.currentChemicals?.length) {
+      toast.error("No chemicals in the instrument");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/reactions/reaction`,
         { chemicals: instrument.currentChemicals }
       );
-      if (response.status !== 200 || !response.data.success) {
-        throw new Error("Unexpected server response");
+
+      const { success, data, message } = response.data;
+
+      if (!success) {
+        toast.error(message || "Reaction failed");
+        setIsLoading(false);
+        return;
       }
-      const { success, newColor } = response.data;
-      console.log(response.data);
-      if (success) {
+      console.log(data);
+      setReactionEquation(data.equation || "No equation provided");
+      toast.success("Reaction successful");
+
+      if (data.products && data.products.length > 0) {
         const updatedItems = items.map((item) =>
           item.id === instrumentId
-            ? { ...item, color: newColor, currentChemicals: [] }
+            ? { ...item, color: data.products[0].color, currentChemicals: [] }
             : item
         );
         setItems(updatedItems);
         addHistory(updatedItems);
+
         // Reaction animation
         const reactionCircle = `#chemical-reaction-${instrument.id}`;
-        gsap.to(reactionCircle, {
+        const productColors = data.products.map((p: any) => p.color);
+
+        gsap.timeline().to(reactionCircle, {
           scale: 1.5,
           duration: 1,
-          repeat: 2,
+          repeat: productColors.length,
           yoyo: true,
-          ease: "power2.inOut",
+          backgroundColor: productColors[0],
           onComplete: () => {
-            // Change to output color
-            gsap.to(`#chemical-reaction-${instrument.id}`, {
-              backgroundColor: newColor,
-              duration: 1,
+            // Cycle through product colors
+            productColors.forEach((color: string, index: number) => {
+              setTimeout(() => {
+                gsap.to(reactionCircle, {
+                  backgroundColor: color,
+                  duration: 0.5,
+                });
+              }, index * 1000);
             });
           },
         });
-
-        console.log(instrumentId);
       } else {
-        toast.error("Reaction is not possible!");
+        toast.info("No reaction occurred");
       }
-      setIsLoading(false);
     } catch (error) {
       console.error("Reaction failed:", error);
+      toast.error("Unexpected error occurred");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -330,7 +350,7 @@ const Workspace: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-[93vh]">
       <ActionBar undo={undo} redo={redo} clearWorkspace={resetWorkspace} />
       <div
         className="relative flex-1 bg-gray-50 border-t border-gray-200 overflow-hidden"
@@ -415,6 +435,9 @@ const Workspace: React.FC = () => {
           </div>
         ))}
       </div>
+      {reactionEquation && (
+      <ReactionEquationBox equation={reactionEquation} />
+      )}
     </div>
   );
 };
