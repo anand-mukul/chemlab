@@ -106,10 +106,3 @@ Contributions are welcome! To get started:
 This project is licensed under the [MIT License](LICENSE).
 
 ---
-
-## **📧 Contact**
-
-**Author**: Mukul Anand  
-
-- **GitHub**: [@anand-mukul](https://github.com/anand-mukul)  
-- **Email**: [mukulanand.dev@gmail.com](mailto:mukulanand.dev@gmail.com)  
