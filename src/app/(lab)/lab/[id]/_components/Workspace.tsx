@@ -350,10 +350,10 @@ const Workspace: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-[93vh]">
+    <div className="flex flex-col h-full">
       <ActionBar undo={undo} redo={redo} clearWorkspace={resetWorkspace} />
       <div
-        className="relative flex-1 bg-gray-50 border-t border-gray-200 overflow-hidden"
+        className="relative flex-1 bg-gradient-to-r from-[#171717] via-[#171717] to-[#171717] border-t border-gray-200 overflow-hidden"
         ref={workspaceRef}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
@@ -435,9 +435,7 @@ const Workspace: React.FC = () => {
           </div>
         ))}
       </div>
-      {reactionEquation && (
-      <ReactionEquationBox equation={reactionEquation} />
-      )}
+      {reactionEquation && <ReactionEquationBox equation={reactionEquation} />}
     </div>
   );
 };
