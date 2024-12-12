@@ -27,7 +27,7 @@ const WorkspaceNameInput = ({ workspaceId }: { workspaceId: string }) => {
   useEffect(() => {
     const loadWorkspaceName = async () => {
       try {
-        const response = await axios.get(`https://chemlab-backend.onrender.com/api/v1/workspace/${workspaceId}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/workspace/${workspaceId}`);
         setWorkspaceName(response.data.workspace.name);
       } catch (error) {
         console.log(
@@ -49,7 +49,7 @@ const WorkspaceNameInput = ({ workspaceId }: { workspaceId: string }) => {
 
   const saveWorkspaceName = async () => {
     try {
-      await axios.post("/api/workspace", {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/workspace`, {
         id: workspaceId,
         name: workspaceName,
       });
