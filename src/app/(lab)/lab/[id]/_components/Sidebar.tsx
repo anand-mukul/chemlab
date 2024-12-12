@@ -1,20 +1,6 @@
 "use client";
 import * as React from "react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarRail,
-} from "@/components/ui/sidebar";
+import { Sidebar, SidebarFooter, SidebarRail } from "@/components/ui/sidebar";
 import { SearchBar } from "./Searchbar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
