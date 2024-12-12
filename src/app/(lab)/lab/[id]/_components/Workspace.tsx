@@ -65,8 +65,10 @@ const Workspace: React.FC = () => {
 
   // Opens a modal for a chemical-instrument interaction
   const openModal = (chemical: DraggableItem, targetInstrument: DraggableItem) => {
-    setModalData({ chemical, targetInstrument });
-    setIsModalOpen(true);
+    if (chemical.type === "chemical" && targetInstrument.type === "instrument") {
+      setModalData({ chemical, targetInstrument });
+      setIsModalOpen(true);
+    }
   };
 
   const closeModal = () => {
@@ -300,13 +302,14 @@ const Workspace: React.FC = () => {
     const draggedItem = items.find((item) => item.id === selectedItemId);
 
     if (draggedItem) {
-      const targetInstrument = items.find((item) => item.type === "instrument" && checkCollision({ ...draggedItem, position: { x, y } }, item));
+      if (draggedItem.type === "chemical") {
+        const targetInstrument = items.find((item) => item.type === "instrument" && checkCollision({ ...draggedItem, position: { x, y } }, item));
 
-      if (targetInstrument) {
-        openModal(draggedItem, targetInstrument);
-        return;
+        if (targetInstrument) {
+          openModal(draggedItem, targetInstrument);
+          return;
+        }
       }
-
       const updatedItems = items.map((item) => (item.id === selectedItemId ? { ...item, position: { x, y } } : item));
 
       setItems(updatedItems);
