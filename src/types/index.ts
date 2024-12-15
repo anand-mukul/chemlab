@@ -2,6 +2,7 @@ export interface Chemical {
   _id: string;
   name: string;
   formula: string;
+  icon: string;
   color: string;
 }
 
