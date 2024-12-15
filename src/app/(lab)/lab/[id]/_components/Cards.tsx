@@ -44,10 +44,14 @@ const ChemicalCard = ({ chemical }: { chemical: Chemical }) => (
     }}
     className="flex flex-col items-center justify-around w-full h-[12vh] bg-slate-50 border rounded-lg cursor-grab hover:bg-slate-200"
   >
-    <div
-      className="w-10 h-10 rounded-full border"
-      style={{ backgroundColor: chemical.color }}
-    ></div>
+    <Image
+      className="w-12 h-12 rounded-full"
+      src={chemical.icon || "/placeholder.png"}
+      alt={`${chemical.name} icon`}
+      width={100}
+      height={100}
+      onDragStart={(e) => e.preventDefault()}
+    />
     <span className="text-black text-[10px]">{renderFormula(chemical.formula)}</span>
   </div>
 );
