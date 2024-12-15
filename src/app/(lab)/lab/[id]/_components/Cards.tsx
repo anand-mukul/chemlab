@@ -26,7 +26,7 @@ const InstrumentCard = ({ instrument }: { instrument: Instrument }) => (
       alt={`${instrument.name} icon`}
       width={100}
       height={100}
-      onDragStart={(e) => e.preventDefault()}
+      draggable
     />
     <span className="text-black text-[10px]">{instrument.name}</span>
   </div>
@@ -50,7 +50,8 @@ const ChemicalCard = ({ chemical }: { chemical: Chemical }) => (
       alt={`${chemical.name} icon`}
       width={100}
       height={100}
-      onDragStart={(e) => e.preventDefault()}
+      draggable
+      // onDragStart={(e) => e.preventDefault()}
     />
     <span className="text-black text-[10px]">{renderFormula(chemical.formula)}</span>
   </div>
