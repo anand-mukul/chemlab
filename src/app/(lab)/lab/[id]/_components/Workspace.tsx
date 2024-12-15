@@ -12,6 +12,7 @@ import { gsap } from "gsap";
 import { toast } from "sonner";
 import ReactionEquationBox from "./ReactionEquationBox";
 import { Input } from "@/components/ui/input";
+import InstrumentIcon from "./InstrumentIcon";
 
 // Type definitions for better clarity
 type Chemical = {
@@ -20,7 +21,7 @@ type Chemical = {
   color: string;
 };
 
-type DraggableItem = {
+export type DraggableItem = {
   id: string;
   name: string;
   position: { x: number; y: number };
@@ -59,13 +60,20 @@ const Workspace: React.FC = () => {
     [key: string]: boolean;
   }>({});
   const [toolboxTimeout, setToolboxTimeout] = useState<number | null>(null);
+  const [svgContent, setSvgContent] = useState<string | null>(null);
 
   // Drag and drop handling
   const handleDragOver = (e: React.DragEvent) => e.preventDefault();
 
   // Opens a modal for a chemical-instrument interaction
-  const openModal = (chemical: DraggableItem, targetInstrument: DraggableItem) => {
-    if (chemical.type === "chemical" && targetInstrument.type === "instrument") {
+  const openModal = (
+    chemical: DraggableItem,
+    targetInstrument: DraggableItem
+  ) => {
+    if (
+      chemical.type === "chemical" &&
+      targetInstrument.type === "instrument"
+    ) {
       setModalData({ chemical, targetInstrument });
       setIsModalOpen(true);
     }
@@ -94,7 +102,14 @@ const Workspace: React.FC = () => {
     }
 
     if (type === "chemical") {
-      const targetInstrument = items.find((item) => x >= item.position.x && x <= item.position.x + item.size && y >= item.position.y && y <= item.position.y + item.size && item.type === "instrument");
+      const targetInstrument = items.find(
+        (item) =>
+          x >= item.position.x &&
+          x <= item.position.x + item.size &&
+          y >= item.position.y &&
+          y <= item.position.y + item.size &&
+          item.type === "instrument"
+      );
 
       if (targetInstrument) {
         setPositionLock(true);
@@ -118,16 +133,33 @@ const Workspace: React.FC = () => {
   };
 
   // Checks for collision between two items
-  const checkCollision = (item1: DraggableItem, item2: DraggableItem): boolean => {
-    const distance = Math.sqrt(Math.pow(item1.position.x + item1.size / 2 - (item2.position.x + item2.size / 2), 2) + Math.pow(item1.position.y + item1.size / 2 - (item2.position.y + item2.size / 2), 2));
+  const checkCollision = (
+    item1: DraggableItem,
+    item2: DraggableItem
+  ): boolean => {
+    const distance = Math.sqrt(
+      Math.pow(
+        item1.position.x + item1.size / 2 - (item2.position.x + item2.size / 2),
+        2
+      ) +
+        Math.pow(
+          item1.position.y +
+            item1.size / 2 -
+            (item2.position.y + item2.size / 2),
+          2
+        )
+    );
 
     const combinedRadius = (item1.size + item2.size) / 2;
     return distance < combinedRadius;
   };
 
   // Triggers interaction logic between chemical and instrument
-  const handleInteraction = (chemical: DraggableItem, targetInstrument: DraggableItem) => {
-    const quantity = chemical.quantity || 1;
+  const handleInteraction = (
+    chemical: DraggableItem,
+    targetInstrument: DraggableItem
+  ) => {
+    const quantity = inputQuantity || 1;
 
     const updatedItems = items.map((item) =>
       item.id === targetInstrument.id
@@ -142,7 +174,7 @@ const Workspace: React.FC = () => {
               },
             ],
           }
-        : item,
+        : item
     );
     // @ts-ignore
     setItems(updatedItems);
@@ -150,7 +182,7 @@ const Workspace: React.FC = () => {
 
     // GSAP Animation
     const pipetteSelector = `#pipette-${chemical.id}`;
-    const instrumentSelector = `#instrument-${targetInstrument.id}`;
+    const instrumentSelector = `#${targetInstrument.id}`;
     const reactionCircleSelector = `#chemical-reaction-${targetInstrument.id}`;
 
     const pipetteElement = document.querySelector(pipetteSelector);
@@ -170,61 +202,96 @@ const Workspace: React.FC = () => {
       return;
     }
 
+    const chemicalData = chemical;
+    const instrumentData = targetInstrument;
+    const chemicalColor = chemicalData.color || "#ccc";
     const startX = pipetteRect.left - workspaceRect.left;
     const startY = pipetteRect.top - workspaceRect.top;
-    const targetTopMiddleX = instrumentRect.left - workspaceRect.left + instrumentRect.width / 2 - pipetteRect.width / 2;
-    const targetTopMiddleY = instrumentRect.top - workspaceRect.top - pipetteRect.height * 0.6;
-    const targetCenterX = instrumentRect.left - workspaceRect.left + instrumentRect.width / 2 - pipetteRect.width / 2;
-    const targetCenterY = instrumentRect.top - workspaceRect.top + instrumentRect.height / 2 - pipetteRect.height / 2;
+    const targetTopMiddleX =
+      instrumentRect.left -
+      workspaceRect.left +
+      instrumentRect.width / 2 -
+      pipetteRect.width / 2;
+    const targetTopMiddleY =
+      instrumentRect.top - workspaceRect.top - pipetteRect.height * 0.6;
+    const targetCenterX =
+      instrumentRect.left -
+      workspaceRect.left +
+      instrumentRect.width / 2 -
+      pipetteRect.width / 2;
+    const targetCenterY =
+      instrumentRect.top -
+      workspaceRect.top +
+      instrumentRect.height / 2 -
+      pipetteRect.height / 2;
 
     gsap.set(pipetteSelector, { x: 0, y: 0, rotation: 0 });
-    const pipetteTimeline = gsap.timeline();
 
-    pipetteTimeline
-      .to(pipetteSelector, {
-        x: targetTopMiddleX - startX,
-        y: targetTopMiddleY - startY,
-        duration: 1,
-        ease: "power2.inOut",
-      })
-      .to(pipetteSelector, { rotation: -45, duration: 0.5 })
-      .to(pipetteSelector, {
-        y: targetCenterY - startY,
-        duration: 0.8,
-        ease: "power2.inOut",
-      })
-      .to(
-        reactionCircleSelector,
-        {
-          scale: 1.2,
-          opacity: 0.8,
-          backgroundColor: chemical.color,
+    const timeline = gsap.timeline();
+
+    if (instrumentData.name === "Beaker") {
+      const liquidSelector = `#${instrumentData.id}`;
+      const liquidElement = document.querySelector("#liquidRect");
+      const liquidFillElement = document.querySelector("#liquidFill");
+
+      if (!liquidElement || !liquidFillElement) {
+        console.error(
+          `Liquid rectangle (#liquidRect) or fill (#liquidFill) not found in container: ${liquidSelector}`
+        );
+        return;
+      }
+
+      const currentHeight = parseFloat(
+        liquidElement.getAttribute("height") || "0"
+      );
+      const newHeight = Math.min(currentHeight + (quantity / 50) * 100, 100);
+
+      timeline
+        .to(pipetteSelector, {
+          x: targetTopMiddleX - startX,
+          y: targetTopMiddleY - startY,
           duration: 1,
-          ease: "power3.out",
-        },
-        "-=0.5",
-      )
-      .to(pipetteSelector, {
-        x: targetTopMiddleX - startX,
-        y: targetTopMiddleY - startY,
-        duration: 0.6,
-        ease: "power2.inOut",
-      })
-      .to(pipetteSelector, { rotation: 0, duration: 0.5 })
-      .to(pipetteSelector, {
-        x: 0,
-        y: 0,
-        duration: 0.7,
-        ease: "power2.inOut",
-      });
-
-    gsap.to(reactionCircleSelector, {
-      boxShadow: `0px 0px 15px 5px ${chemical.color}`,
-      duration: 0.5,
-      repeat: 1,
-      yoyo: true,
-    });
-
+          ease: "power2.inOut",
+        })
+        .to(pipetteSelector, { rotation: -45, duration: 0.5 })
+        .to(pipetteSelector, {
+          y: targetCenterY - startY,
+          duration: 0.8,
+          ease: "power2.inOut",
+        })
+        .to(
+          liquidElement,
+          {
+            attr: { height: newHeight, y: 92 - newHeight },
+            duration: 1,
+            ease: "power3.out",
+          },
+          "-=0.5"
+        )
+        .to(
+          liquidFillElement,
+          {
+            fill: chemicalColor,
+            duration: 1,
+            ease: "power3.out",
+          },
+          "-=1"
+        )
+        .to(pipetteSelector, {
+          x: targetTopMiddleX - startX,
+          y: targetTopMiddleY - startY,
+          duration: 0.6,
+          ease: "power2.inOut",
+        })
+        .to(pipetteSelector, { rotation: 0, duration: 0.5 })
+        .to(pipetteSelector, {
+          x: 0,
+          y: 0,
+          duration: 0.7,
+          ease: "power2.inOut",
+        });
+    }
+    // Add more cases for other instruments animations here
     toast.success(`${chemical.name} added to ${targetInstrument.name}`);
     setPositionLock(false);
   };
@@ -240,7 +307,10 @@ const Workspace: React.FC = () => {
     }
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/reactions/reaction`, { chemicals: instrument.currentChemicals });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/reactions/reaction`,
+        { chemicals: instrument.currentChemicals }
+      );
 
       const { success, data, message } = response.data;
 
@@ -249,31 +319,33 @@ const Workspace: React.FC = () => {
         setIsLoading(false);
         return;
       }
-      console.log(data);
       setReactionEquation(data.equation || "No equation provided");
       toast.success("Reaction successful");
 
       if (data.products && data.products.length > 0) {
-        const updatedItems = items.map((item) => (item.id === instrumentId ? { ...item, color: data.products[0].color, currentChemicals: [] } : item));
+        const updatedItems = items.map((item) =>
+          item.id === instrumentId
+            ? { ...item, color: data.products[0].color, currentChemicals: [] }
+            : item
+        );
         setItems(updatedItems);
         addHistory(updatedItems);
 
         // Reaction animation
-        const reactionCircle = `#chemical-reaction-${instrument.id}`;
+        const liquidFillElement = document.querySelector("#liquidFill");
         const productColors = data.products.map((p: any) => p.color);
 
-        gsap.timeline().to(reactionCircle, {
-          scale: 1.5,
+        gsap.timeline().to(liquidFillElement, {
           duration: 1,
           repeat: productColors.length,
           yoyo: true,
-          backgroundColor: productColors[0],
+          fill: productColors[0],
           onComplete: () => {
             // Cycle through product colors
             productColors.forEach((color: string, index: number) => {
               setTimeout(() => {
-                gsap.to(reactionCircle, {
-                  backgroundColor: color,
+                gsap.to(liquidFillElement, {
+                  fill: color,
                   duration: 0.5,
                 });
               }, index * 1000);
@@ -303,14 +375,20 @@ const Workspace: React.FC = () => {
 
     if (draggedItem) {
       if (draggedItem.type === "chemical") {
-        const targetInstrument = items.find((item) => item.type === "instrument" && checkCollision({ ...draggedItem, position: { x, y } }, item));
+        const targetInstrument = items.find(
+          (item) =>
+            item.type === "instrument" &&
+            checkCollision({ ...draggedItem, position: { x, y } }, item)
+        );
 
         if (targetInstrument) {
           openModal(draggedItem, targetInstrument);
           return;
         }
       }
-      const updatedItems = items.map((item) => (item.id === selectedItemId ? { ...item, position: { x, y } } : item));
+      const updatedItems = items.map((item) =>
+        item.id === selectedItemId ? { ...item, position: { x, y } } : item
+      );
 
       setItems(updatedItems);
       addHistory(updatedItems);
@@ -321,7 +399,11 @@ const Workspace: React.FC = () => {
 
   // Other utility functions (resize, remove, reset, etc.)
   const handleResize = (id: string, increment: number) => {
-    const updatedItems = items.map((item) => (item.id === id ? { ...item, size: Math.max(10, item.size + increment) } : item));
+    const updatedItems = items.map((item) =>
+      item.id === id
+        ? { ...item, size: Math.max(10, item.size + increment) }
+        : item
+    );
     setItems(updatedItems);
   };
 
@@ -389,10 +471,18 @@ const Workspace: React.FC = () => {
     setToolBoxVisible((prev) => ({ ...prev, [id]: true }));
   };
 
+  const dynamicImageSrc = (name: string) =>
+    `/instruments/${name.toLowerCase().replace(/ /g, "-")}.svg`;
+
   return (
     <div className="flex flex-col h-full">
       <ActionBar undo={undo} redo={redo} clearWorkspace={resetWorkspace} />
-      <div className="relative flex-1 bg-gradient-to-r from-[#171717] via-[#171717] to-[#171717] border-t border-gray-200 overflow-hidden" ref={workspaceRef} onDragOver={handleDragOver} onDrop={handleDrop}>
+      <div
+        className="relative flex-1 bg-gradient-to-r from-[#171717] via-[#171717] to-[#171717] border-t border-gray-200 overflow-hidden"
+        ref={workspaceRef}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
         {items.map((item) => (
           <div
             key={item.id}
@@ -414,24 +504,43 @@ const Workspace: React.FC = () => {
             <div className="flex flex-col items-center">
               {item.type === "instrument" ? (
                 <div className="relative inline-block">
-                  <Image id={`instrument-${item.id}`} className="" src={item.icon || "/instruments/beaker.svg"} alt={`${item.name} icon`} width={item.size} height={item.size} />
-                  <div id={`chemical-reaction-${item.id}`} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full"></div>
+                  <InstrumentIcon item={item} />
                 </div>
               ) : (
                 <div>
-                  <Image id={`pipette-${item.id}`} src={"/instruments/pipette.svg"} alt={`${item.name} icon`} width={item.size} height={item.size} />
+                  <Image
+                    id={`pipette-${item.id}`}
+                    src={"/instruments/pipette.svg"}
+                    alt={`${item.name} icon`}
+                    width={item.size}
+                    height={item.size}
+                  />
                 </div>
               )}
 
               <div className="flex flex-col items-center">
                 {toolBoxVisible[item.id] && (
-                  <div className="absolute flex items-center gap-2 p-2 rounded" onMouseEnter={(e) => cancelHideToolbox(e, item.id)} onMouseLeave={() => hideToolbox(item.id)}>
-                    <Button onClick={() => handleRemove(item.id)} className="bg-transparent text-red-600 hover:text-red-800 text-xs hover:bg-muted rounded-full">
+                  <div
+                    className="absolute flex items-center gap-2 p-2 rounded"
+                    onMouseEnter={(e) => cancelHideToolbox(e, item.id)}
+                    onMouseLeave={() => hideToolbox(item.id)}
+                  >
+                    <Button
+                      onClick={() => handleRemove(item.id)}
+                      className="bg-transparent text-red-600 hover:text-red-800 text-xs hover:bg-muted rounded-full"
+                    >
                       <Trash2Icon className="w-4 h-4" />
                     </Button>
                     {item.type === "instrument" && (
-                      <Button onClick={() => startReaction(item.id)} className="bg-transparent text-green-600 hover:text-green-800 text-xs hover:bg-muted rounded-full">
-                        {isLoading ? <Loader className="w-4 h-4 animate-spin" /> : <PlayIcon className="w-4 h-4" />}
+                      <Button
+                        onClick={() => startReaction(item.id)}
+                        className="bg-transparent text-green-600 hover:text-green-800 text-xs hover:bg-muted rounded-full"
+                      >
+                        {isLoading ? (
+                          <Loader className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <PlayIcon className="w-4 h-4" />
+                        )}
                       </Button>
                     )}
                     <Button
@@ -453,8 +562,17 @@ const Workspace: React.FC = () => {
       {isModalOpen && modalData && (
         <div className="z-5 flex items-center justify-center fixed top-0 left-0 w-full h-full bg-black/50">
           <div className="bg-black p-6 w-full max-w-md rounded-md">
-            <h3 className="text-lg font-semibold text-white mb-4">Enter Quantity of {modalData.chemical.name}:</h3>
-            <Input type="number" value={inputQuantity} onChange={(e) => setInputQuantity(Number(e.target.value))} min={1} placeholder="Quantity" className="text-white p-2 w-full rounded-md" />
+            <h3 className="text-lg font-semibold text-white mb-4">
+              Enter Quantity of {modalData.chemical.name}:
+            </h3>
+            <Input
+              type="number"
+              value={inputQuantity}
+              onChange={(e) => setInputQuantity(Number(e.target.value))}
+              min={1}
+              placeholder="Quantity"
+              className="text-white p-2 w-full rounded-md"
+            />
             <div className="flex justify-end gap-4 mt-6">
               <Button variant="destructive" onClick={closeModal}>
                 Cancel
